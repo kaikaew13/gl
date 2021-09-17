@@ -9,8 +9,13 @@
 #include <cmath>
 #include <math.h>
 #include <cstdio>
-#include <sys/ioctl.h>
 #include <unistd.h>
+
+#if defined(_WIN32)
+#include <windows.h>
+#else
+#include <sys/ioctl.h>
+#endif
 
 int pixel_map[4][2] = {
     {0x1, 0x8},
@@ -59,10 +64,18 @@ public:
     std::map<int, std::map<int, std::pair<int, short>>> chars;
     Canvas() : line_ending("\n")
     {
+#if defined(_WIN32)
+        CONSOLE_SCREEN_BUFFER_INFO csbi;
+        GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi);
+        this->width = (int)(csbi.srWindow.Right - csbi.srWindow.Left + 1);
+        this->height = (int)(csbi.srWindow.Bottom - csbi.srWindow.Top + 1);
+
+#else
         struct winsize ws;
         ioctl(STDOUT_FILENO, TIOCGWINSZ, &ws);
         this->width = ws.ws_col;
         this->height = ws.ws_row;
+#endif
     }
 
     int get_width()
