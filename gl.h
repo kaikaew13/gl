@@ -13,6 +13,7 @@
 
 #if defined(_WIN32)
 #include <windows.h>
+#include <locale>
 #else
 #include <sys/ioctl.h>
 #endif
@@ -69,7 +70,6 @@ public:
         GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi);
         this->width = (int)(csbi.srWindow.Right - csbi.srWindow.Left + 1);
         this->height = (int)(csbi.srWindow.Bottom - csbi.srWindow.Top + 1);
-
 #else
         struct winsize ws;
         ioctl(STDOUT_FILENO, TIOCGWINSZ, &ws);
@@ -91,7 +91,11 @@ public:
     void clear()
     {
         this->chars.clear();
+#if defined(_WIN32)
+        system("cls");
+#else
         system("clear");
+#endif
     }
 
     int max_y()

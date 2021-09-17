@@ -2,6 +2,7 @@
 #include <vector>
 #include <ctime>
 #include <unistd.h>
+#include <algorithm>
 
 #include "gl.h"
 
