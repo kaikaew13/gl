@@ -3,6 +3,8 @@
 #include <ctime>
 #include <unistd.h>
 #include <algorithm>
+#include <fstream>
+#include <strstream>
 
 #include "gl.h"
 
@@ -20,6 +22,43 @@ struct tri
 struct mesh
 {
     std::vector<tri> tris;
+
+    bool loadFromFile(std::string file_name)
+    {
+        std::ifstream f(file_name);
+        if (!f.is_open())
+        {
+            return 0;
+        }
+
+        std::vector<vec3d> verts;
+
+        while (!f.eof())
+        {
+            char line[128];
+            f.getline(line, 128);
+
+            std::strstream ss;
+
+            ss << line;
+
+            char junk;
+            if (line[0] == 'v')
+            {
+                vec3d v;
+                ss >> junk >> v.x >> v.y >> v.z;
+                verts.push_back(v);
+            }
+
+            if (line[0] == 'f')
+            {
+                int f[3];
+                ss >> junk >> f[0] >> f[1] >> f[2];
+                tris.push_back({verts[f[0] - 1], verts[f[1] - 1], verts[f[2] - 1]});
+            }
+        }
+        return 1;
+    }
 };
 
 struct mat4x4
@@ -46,55 +85,35 @@ short GetColour(float lum)
 {
     short bg_col, fg_col;
     wchar_t sym;
-    int pixel_bw = (int)(20.0f * lum);
+    int pixel_bw = (int)(12.0f * lum);
     switch (pixel_bw)
     {
     case 0:
-        return 232;
-
-    case 1:
         return 233;
-        // break;
-    case 2:
-        return 234;
-        break;
-    case 3:
+    case 1:
         return 235;
-        // break;
-    case 4:
-        return 236;
-    case 5:
+    case 2:
         return 237;
-    case 6:
-        return 238;
-    case 7:
+    case 3:
         return 239;
-    case 8:
-        return 240;
-    case 9:
+    case 4:
         return 241;
-    case 10:
-        return 242;
-    case 11:
+    case 5:
         return 243;
-    case 12:
-        return 244;
-    case 13:
+    case 6:
         return 245;
-    case 14:
-        return 246;
-    case 15:
+    case 7:
         return 247;
-    case 16:
-        return 248;
-    case 17:
+    case 8:
         return 249;
-    case 18:
-        return 250;
-    case 19:
+    case 9:
         return 251;
+    case 10:
+        return 253;
+    case 11:
+        return 255;
     }
-    return 232;
+    return 233;
 }
 
 bool cmp(std::vector<double> &v1, std::vector<double> &v2)
@@ -104,9 +123,9 @@ bool cmp(std::vector<double> &v1, std::vector<double> &v2)
 
 void drawTri(double x1, double y1, double x2, double y2, double x3, double y3, Canvas *c)
 {
-    c->draw_line(x1, y1, x2, y2);
-    c->draw_line(x2, y2, x3, y3);
-    c->draw_line(x3, y3, x1, y1);
+    c->draw_line(x1, y1, x2, y2, 10);
+    c->draw_line(x2, y2, x3, y3, 10);
+    c->draw_line(x3, y3, x1, y1, 10);
 }
 
 int main()
@@ -119,20 +138,23 @@ int main()
     time_t startTime = time(0);
 
     // random height and width scaling
-    double height = c->get_height() * 3.0f, width = 1.5f * c->get_width();
-    mCube.tris = {
-        {0, 0, 0, 0, 1, 0, 1, 1, 0},
-        {0, 0, 0, 1, 1, 0, 1, 0, 0},
-        {1, 0, 0, 1, 1, 0, 1, 1, 1},
-        {1, 0, 0, 1, 1, 1, 1, 0, 1},
-        {1, 0, 1, 1, 1, 1, 0, 1, 1},
-        {1, 0, 1, 0, 1, 1, 0, 0, 1},
-        {0, 0, 1, 0, 1, 1, 0, 1, 0},
-        {0, 0, 1, 0, 1, 0, 0, 0, 0},
-        {0, 1, 0, 0, 1, 1, 1, 1, 1},
-        {0, 1, 0, 1, 1, 1, 1, 1, 0},
-        {1, 0, 1, 0, 0, 1, 0, 0, 0},
-        {1, 0, 1, 0, 0, 0, 1, 0, 0}};
+    // double height = c->get_height() * 3.0f, width = 1.5f * c->get_width();
+    double height = c->get_height() * 2.0f, width = c->get_width();
+
+    // mCube.tris = {
+    //     {0, 0, 0, 0, 1, 0, 1, 1, 0},
+    //     {0, 0, 0, 1, 1, 0, 1, 0, 0},
+    //     {1, 0, 0, 1, 1, 0, 1, 1, 1},
+    //     {1, 0, 0, 1, 1, 1, 1, 0, 1},
+    //     {1, 0, 1, 1, 1, 1, 0, 1, 1},
+    //     {1, 0, 1, 0, 1, 1, 0, 0, 1},
+    //     {0, 0, 1, 0, 1, 1, 0, 1, 0},
+    //     {0, 0, 1, 0, 1, 0, 0, 0, 0},
+    //     {0, 1, 0, 0, 1, 1, 1, 1, 1},
+    //     {0, 1, 0, 1, 1, 1, 1, 1, 0},
+    //     {1, 0, 1, 0, 0, 1, 0, 0, 0},
+    //     {1, 0, 1, 0, 0, 0, 1, 0, 0}};
+    mCube.loadFromFile("VideoShip.obj");
 
     double inc = 0;
     double fNear = 0.1f, fFar = 1000.0f, fFov = 90.0f, fAspectRatio = (double)height / width;
@@ -165,6 +187,8 @@ int main()
         matRotX.m[2][2] = cosf(fTheta * 0.5f);
         matRotX.m[3][3] = 1;
 
+        std::vector<tri> sortedTris;
+
         for (auto tr : mCube.tris)
         {
             tri triProjected, triTranslated, triRotatedZ, triRotatedZX;
@@ -179,10 +203,11 @@ int main()
             MultiplyMatrixVector(triRotatedZ.p[1], triRotatedZX.p[1], matRotX);
             MultiplyMatrixVector(triRotatedZ.p[2], triRotatedZX.p[2], matRotX);
 
+            // how far away the object is
             triTranslated = triRotatedZX;
-            triTranslated.p[0].z += 3.0f;
-            triTranslated.p[1].z += 3.0f;
-            triTranslated.p[2].z += 3.0f;
+            triTranslated.p[0].z += 7.0f;
+            triTranslated.p[1].z += 7.0f;
+            triTranslated.p[2].z += 7.0f;
 
             vec3d normal, line1, line2;
             line1.x = triTranslated.p[1].x - triTranslated.p[0].x;
@@ -224,12 +249,12 @@ int main()
 
                 triProjected.col = triTranslated.col;
 
-                triProjected.p[0].x += 1.0f;
-                triProjected.p[0].y += 1.0f;
-                triProjected.p[1].x += 1.0f;
-                triProjected.p[1].y += 1.0f;
-                triProjected.p[2].x += 1.0f;
-                triProjected.p[2].y += 1.0f;
+                triProjected.p[0].x += 2.0f;
+                triProjected.p[0].y += 2.0f;
+                triProjected.p[1].x += 2.0f;
+                triProjected.p[1].y += 2.0f;
+                triProjected.p[2].x += 2.0f;
+                triProjected.p[2].y += 2.0f;
 
                 triProjected.p[0].x *= 0.5f * width;
                 triProjected.p[1].x *= 0.5f * width;
@@ -238,22 +263,33 @@ int main()
                 triProjected.p[1].y *= 0.5f * height;
                 triProjected.p[2].y *= 0.5f * height;
 
-                std::vector<double> v1 = {triProjected.p[0].x, triProjected.p[0].y};
-                std::vector<double> v2 = {triProjected.p[1].x, triProjected.p[1].y};
-                std::vector<double> v3 = {triProjected.p[2].x, triProjected.p[2].y};
-                std::vector<std::vector<double>> V = {v1, v2, v3};
-                std::sort(V.begin(), V.end(), cmp);
-                c->fill_triangle(V[0], V[1], V[2], triProjected.col);
-                // c->fill_triangle(triProjected.p[0].x, triProjected.p[0].y, triProjected.p[1].x, triProjected.p[1].y, triProjected.p[2].x, triProjected.p[2].y);
-                // drawTri(triProjected.p[0].x, triProjected.p[0].y, triProjected.p[1].x, triProjected.p[1].y, triProjected.p[2].x, triProjected.p[2].y, c);
+                sortedTris.push_back(triProjected);
             }
+        }
+
+        std::sort(sortedTris.begin(), sortedTris.end(), [](tri &t1, tri &t2)
+                  {
+                      float z1 = (t1.p[0].z + t1.p[1].z + t1.p[2].z) / 3.0f;
+                      float z2 = (t2.p[0].z + t2.p[1].z + t2.p[2].z) / 3.0f;
+                      return z1 > z2;
+                  });
+
+        for (auto &triProjected : sortedTris)
+        {
+            std::vector<double> v1 = {triProjected.p[0].x, triProjected.p[0].y};
+            std::vector<double> v2 = {triProjected.p[1].x, triProjected.p[1].y};
+            std::vector<double> v3 = {triProjected.p[2].x, triProjected.p[2].y};
+            std::vector<std::vector<double>> V = {v1, v2, v3};
+            std::sort(V.begin(), V.end(), cmp);
+            c->fill_triangle(V[0], V[1], V[2], triProjected.col);
+            // drawTri(triProjected.p[0].x, triProjected.p[0].y, triProjected.p[1].x, triProjected.p[1].y, triProjected.p[2].x, triProjected.p[2].y, c);
         }
         // c->draw_line(0, 0, 100, 100);
 
         std::cout << c->string();
         usleep(100000);
         c->clear();
-        inc += 0.1f;
+        inc += 0.3f;
     }
     // c->draw_line(0, 0, 100, 100);
     // std::cout << c->string();

@@ -343,7 +343,11 @@ public:
 
         double curx1 = v1[0], curx2 = v1[0];
 
-        for (int scanlineY = round(v1[1]); scanlineY <= round(v2[1]); scanlineY++)
+        int tmp = round(v2[1]);
+        if (tmp == (int)v2[1] + 1)
+            tmp--;
+
+        for (int scanlineY = round(v1[1]); scanlineY <= tmp; scanlineY++)
         {
             draw_line(curx1, scanlineY, curx2, scanlineY, col);
             curx1 += invslope1;
@@ -358,7 +362,11 @@ public:
 
         double curx1 = v3[0], curx2 = v3[0];
 
-        for (int scanlineY = round(v3[1]); scanlineY > round(v1[1]); scanlineY--)
+        int tmp = round(v1[1]);
+        if (tmp == (int)v1[1] + 1)
+            tmp--;
+
+        for (int scanlineY = round(v3[1]); scanlineY > tmp; scanlineY--)
         {
             draw_line(curx1, scanlineY, curx2, scanlineY, col);
             curx1 -= invslope1;
