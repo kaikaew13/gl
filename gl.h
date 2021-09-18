@@ -18,6 +18,8 @@
 #include <sys/ioctl.h>
 #endif
 
+#define PI 3.14159
+
 int pixel_map[4][2] = {
     {0x1, 0x8},
     {0x2, 0x10},
@@ -28,7 +30,7 @@ int braille_char_offset = 0x2800;
 
 double radians(double d)
 {
-    return d * (M_PI / 180);
+    return d * (PI / 180);
 }
 
 int get_pixel(int y, int x)

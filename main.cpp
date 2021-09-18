@@ -46,7 +46,7 @@ short GetColour(float lum)
 {
     short bg_col, fg_col;
     wchar_t sym;
-    int pixel_bw = (int)(13.0f * lum);
+    int pixel_bw = (int)(20.0f * lum);
     switch (pixel_bw)
     {
     case 0:
@@ -56,32 +56,45 @@ short GetColour(float lum)
         return 233;
         // break;
     case 2:
-        return 235;
+        return 234;
         break;
     case 3:
-        return 237;
+        return 235;
         // break;
     case 4:
-        return 239;
+        return 236;
     case 5:
-        return 241;
+        return 237;
     case 6:
-        return 243;
+        return 238;
     case 7:
-        return 245;
+        return 239;
     case 8:
-        return 247;
+        return 240;
     case 9:
-        return 249;
+        return 241;
     case 10:
-        return 251;
+        return 242;
     case 11:
-        return 253;
+        return 243;
     case 12:
-        return 255;
-    default:
-        return 232;
+        return 244;
+    case 13:
+        return 245;
+    case 14:
+        return 246;
+    case 15:
+        return 247;
+    case 16:
+        return 248;
+    case 17:
+        return 249;
+    case 18:
+        return 250;
+    case 19:
+        return 251;
     }
+    return 232;
 }
 
 bool cmp(std::vector<double> &v1, std::vector<double> &v2)
